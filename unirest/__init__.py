@@ -1,7 +1,7 @@
 '''
 The MIT License
 
-Copyright (c) 2013 Mashape (https://www.mashape.com)
+Copyright (c) 2013-2016 Mashape (https://www.mashape.com)
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
@@ -37,7 +37,9 @@ try:
 except ImportError:
     import simplejson as json
 
-USER_AGENT = "unirest-python/1.1.6"
+from version import __version__
+
+USER_AGENT = "unirest-python/%s" %(__version__)
 
 _defaultheaders = {}
 _timeout = 10
@@ -139,6 +141,16 @@ def get(url, **kwargs):
 
     return __dorequest("GET", url, {}, kwargs.get(HEADERS_KEY, {}), kwargs.get(AUTH_KEY, None), kwargs.get(CALLBACK_KEY, None))
 
+def head(url, **kwargs):
+    params = get_parameters(kwargs)
+    if len(params) > 0:
+        if url.find("?") == -1:
+            url += "?"
+        else:
+            url += "&"
+        url += utils.dict2query(dict((k, v) for k, v in params.iteritems() if v is not None))  # Removing None values/encode unicode objects
+
+    return __dorequest("HEAD", url, {}, kwargs.get(HEADERS_KEY, {}), kwargs.get(AUTH_KEY, None), kwargs.get(CALLBACK_KEY, None))
 
 def post(url, **kwargs):
     return __dorequest("POST", url, get_parameters(kwargs), kwargs.get(HEADERS_KEY, {}), kwargs.get(AUTH_KEY, None), kwargs.get(CALLBACK_KEY, None))
